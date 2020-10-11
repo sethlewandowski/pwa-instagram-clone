@@ -1,31 +1,24 @@
-let deferredPrompt;
 
-// check if sw is available in user browser
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker
-    .register('/sw.js') // returns a promise
-    .then(() => console.log('service worker registered.'));
+var deferredPrompt;
+
+if (!window.Promise) {
+  window.Promise = Promise;
 }
 
-window.addEventListener('beforeinstallprompt', (event) => {
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker
+    .register('/sw.js')
+    .then(function () {
+      console.log('Service worker registered!');
+    })
+    .catch(function(err) {
+      console.log(err);
+    });
+}
+
+window.addEventListener('beforeinstallprompt', function(event) {
   console.log('beforeinstallprompt fired');
-  event.preventDefault;
+  event.preventDefault();
   deferredPrompt = event;
   return false;
 });
-
-const getIp = new Promise((resolve, reject) => {
-  fetch('https://httpbin.org/ip')
-    .then((response) => {
-      return response.json();
-    })
-    .then((data) => {
-      console.log(data);
-    });
-});
-
-(async () => {
-  const response = await fetch('https://httpbin.org/ip');
-  const json = await response.json();
-  console.log(json);
-})();
